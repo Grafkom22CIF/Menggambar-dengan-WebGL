@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menggambar Primitif</title>
+</head>
+<body onload="main()">
+    <canvas id="myCanvas" style="border: 1px solid black;" width="650px" height="650px">
+    </canvas>
+    <script src="main.js">
+    </script>
+
+    <script id="vertexShaderCode" type="notjs">
+        attribute vec2 aPosition;
+        attribute vec3 a_Color;
+        varying vec3 vColor;
+        void main() {
+            vColor = a_Color;
+            gl_Position = vec4(aPosition, 0.0, 1.0);
+        }
+    </script>
+    <script id="fragmentShaderCode" type="notjs">
+        precision mediump float;
+        varying vec3 vColor;
+        void main() {
+        gl_FragColor = vec4(vColor, 1.0);
+        }
+    </script>
+</body>
+</html>
