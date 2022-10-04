@@ -14,12 +14,15 @@
 
     <script id="vertexShaderCode" type="notjs">
         attribute vec2 aPosition;
-        attribute vec3 a_Color;
+        attribute vec3 aColor;
+        uniform mat4 uMatrix;
+        uniform mat4 uProj;
+        uniform mat4 uView;
+        uniform mat4 uModel;
         varying vec3 vColor;
-        uniform mat4 uMatriks;
         void main() {
-            vColor = a_Color;
-            gl_Position = uMatriks*vec4(aPosition, 0.0, 1.0);
+            vColor = aColor;
+            gl_Position = uProj*uView*uModel*vec4(aPosition, 0.0, 1.0);
         }
     </script>
     <script id="fragmentShaderCode" type="notjs">

@@ -4,10 +4,10 @@ function main(){
 
     //mendefinisikan titik yg akan dibuat
     var vertices = [
-        0.1, 0.5, 1.0, 1.0, 0.0,   //titik A yellow
-        0.5, 0.5, 1.0, 1.0, 0.0,   //titik B yellow
-        0.5, 0.1, 1.0, 1.0, 0.0,    //titik C yellow
-        0.1, 0.1, 1.0, 1.0, 0.0    //titik D yellow
+        0.1, 0.5, 1.0, 0.0, 0.0,   //titik A 
+        0.5, 0.5, 1.0, 0.0, 0.0,   //titik B 
+        0.5, 0.1, 1.0, 0.0, 0.0,    //titik C 
+        0.1, 0.1, 1.0, 0.0, 0.0    //titik D yellow
     ];
 
     //membuat variabel sementara (temporary) untuk menyimpan koordinat sblm digambar
@@ -43,17 +43,63 @@ function main(){
     gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 5 * Float32Array.BYTES_PER_ELEMENT, 0);
     gl.enableVertexAttribArray(aPosition);
 
-    var aColor = gl.getAttribLocation(program, "a_Color");
+    var aColor = gl.getAttribLocation(program, "aColor");
     gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 5 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
-    gl.enableVertexAttribArray(aColor);
+    gl.enableVertexAttribArray(aColor);  
+    
+    var Pmatrix = gl.getUniformLocation(program, "uProj");
+    var Vmatrix = gl.getUniformLocation(program, "uView");
+    var Mmatrix = gl.getUniformLocation(program, "uModel");
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    
+    var projmatrix = getprojection(40, canvas.width/canvas.height, 1, 100);
+    var modmatrix = [
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1];
+    var viewmatrix = [
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1];
 
-    rotasi(gl, program);
+    viewmatrix[14] = viewmatrix[14]-2;
 
-    //membuat warna background
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
-    //mengosongkan canvas
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    var freeze = false;
+    function onMouseClick(event){
+        if(freeze) freeze = false;
+        else freeze = true;
+    }
+    document.addEventListener('click', onMouseClick, false);
 
-    //mulai menggambar
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+    function onKeyDown(event){
+        if(event.keyCode == 32) freeze = true;
+    }
+    function onKeyUp(event){
+        if(event.keyCode == 32) freeze = false;
+    }
+    document.addEventListener('keydown', onKeyDown, false);
+    document.addEventListener('keyup', onKeyUp, false);
+
+    var timeold = 0;
+   function render(time) {
+        if(!freeze){
+            var dt = time-timeold;
+            skalasi(modmatrix);
+            //rotasi(mod_matrix, 0.005);
+            time_old = time;
+        }
+
+        gl.uniformMatrix4fv(Pmatrix, false, projmatrix);
+        gl.uniformMatrix4fv(Vmatrix, false, viewmatrix);
+        gl.uniformMatrix4fv(Mmatrix, false, modmatrix);
+
+        gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+        window.requestAnimationFrame(render);
+    }
+    render(0);
 }
